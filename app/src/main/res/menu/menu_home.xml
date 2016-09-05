@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/action_clear_data"
+        android:icon="@android:drawable/stat_notify_sync_noanim"
+        android:title="@string/action_clear_data"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_quit"
+        android:title="@string/action_quit"
+        app:showAsAction="never" />
+
+</menu>
