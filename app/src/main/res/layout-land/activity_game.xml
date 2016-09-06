@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.projects.karan.minisquash.GameActivity">
+    tools:context=".ui.GameActivity">
 
     <LinearLayout
         android:id="@+id/linear_points_horizontal"

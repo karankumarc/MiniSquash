@@ -1,4 +1,4 @@
-package com.projects.karan.minisquash;
+package com.projects.karan.minisquash.ui;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -15,6 +15,7 @@ import android.widget.EditText;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
+import com.projects.karan.minisquash.R;
 import com.projects.karan.minisquash.utils.Constants;
 
 public class HomeActivity extends AppCompatActivity implements RadioGroup.OnCheckedChangeListener, View.OnClickListener{

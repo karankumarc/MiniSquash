@@ -1,9 +1,9 @@
-package com.projects.karan.minisquash;
+package com.projects.karan.minisquash.ui;
 
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.support.v4.app.NavUtils;
+import android.database.Cursor;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -16,12 +16,17 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.projects.karan.minisquash.R;
+import com.projects.karan.minisquash.data.MiniSquashContract;
+import com.projects.karan.minisquash.data.MyDatabase;
 import com.projects.karan.minisquash.model.GameState;
 import com.projects.karan.minisquash.utils.Constants;
 
 import java.util.ArrayList;
 
 public class GameActivity extends AppCompatActivity implements View.OnClickListener {
+
+    MyDatabase myDatabase;
 
     LinearLayout linearLayoutPlayer1, linearLayoutPlayer2;
     TextView textViewPlayer1Name, textViewPlayer2Name, textViewPlayer1Score, textViewPlayer2Score, textViewCurrentSet,
@@ -32,7 +37,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             totalScoreCount = 0, player1SetsWon = 0, player2SetsWon = 0, currentSet = 1;
     String playerOneName, playerTwoName;
     boolean isPlayer1Serving, hasPlayer1ServedFirstInSet, hasPlayer1ServedFirstInMatch;
-    private boolean isTieBreaker = false, isGameOver = false;
+    private boolean isTieBreaker = false, isGameOver = false, isSetOver = false;
     boolean isHomePressed = false;
 
     ArrayList<GameState> gameTrackerList = new ArrayList<>();
@@ -41,6 +46,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
+
+        myDatabase = new MyDatabase(this);
 
         linearLayoutPlayer1 = (LinearLayout) findViewById(R.id.linear_player_1_vertical);
         linearLayoutPlayer2 = (LinearLayout) findViewById(R.id.linear_player_2_vertical);
@@ -118,6 +125,17 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         textViewPlayer1SetsWon.setText("" + player1SetsWon);
         textViewPlayer2SetsWon.setText("" + player2SetsWon);
         textViewCurrentSet.setText("" + currentSet + "/" + totalSets);
+
+        myDatabase.database = myDatabase.openReadableDatabaseInstance();
+        Cursor c = myDatabase.getAllGameDetails();
+        if(c.moveToFirst()){
+            do{
+                int didPlayer1win = c.getInt(c.getColumnIndex(MiniSquashContract.GameStateDetailsEntry.COLUMN_DID_PLAYER_1_WIN));
+                GameState gameState = new GameState(didPlayer1win);
+                gameTrackerList.add(gameState);
+            }while (c.moveToNext());
+        }
+        myDatabase.closeDatabaseConnection();
     }
 
     @Override
@@ -187,6 +205,11 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
         editor.apply();
 
+        myDatabase.database = myDatabase.openWritableDatabaseInstance();
+        for (int i = 0; i < gameTrackerList.size(); i++) {
+            myDatabase.insertGameDetails(gameTrackerList.get(i).didPlayer1WinThePoint());
+        }
+        myDatabase.closeDatabaseConnection();
     }
 
     @Override
@@ -212,20 +235,37 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         if( totalScoreCount == 0 || gameTrackerList.size() == 0 ){
             Toast.makeText(GameActivity.this, "Game state info not available", Toast.LENGTH_SHORT).show();
         } else if(totalScoreCount > 0 && gameTrackerList.size() != 0){
-            GameState perviousGameState = gameTrackerList.get(gameTrackerList.size()-2);
+            GameState previousGameState;
+            //previousGameState = gameTrackerList.get(gameTrackerList.size()-2);
             GameState gameState = gameTrackerList.get(gameTrackerList.size()-1);
+
+            /*if(gameState.didGameEnterInTieBreakerMode() && !previousGameState.didGameEnterInTieBreakerMode()){
+                isTieBreaker = false;
+            }*/
+            if(totalScoreCount == pointsPerSet*2){
+                isTieBreaker = false;
+            }
+
             if(gameState.didPlayer1WinThePoint()){
                 player1CurrentScore--;
                 textViewPlayer1Score.setText(""+player1CurrentScore);
+                if(isGameOver || isSetOver){
+                    isGameOver = isSetOver = false;
+                    player1SetsWon--;
+                }
             } else {
                 player2CurrentScore--;
                 textViewPlayer2Score.setText(""+player2CurrentScore);
-            }
-            if(gameState.didGameEnterInTieBreakerMode() && !perviousGameState.didGameEnterInTieBreakerMode()){
-                isTieBreaker = false;
+                if(isGameOver || isSetOver){
+                    isGameOver = isSetOver = false;
+                    player2SetsWon--;
+                }
             }
             totalScoreCount--;
             gameTrackerList.remove(gameTrackerList.size()-1);
+
+
+
             checkServiceChangeOnUndo();
         }
     }
@@ -242,9 +282,9 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             isTieBreaker = true;
         } else if (player1CurrentScore > pointsPerSet && player1CurrentScore - player2CurrentScore == 1) {
             isTieBreaker = true;
-        } else if (player1CurrentScore == pointsPerSet + 1 && isTieBreaker == false) {
+        } else if (player1CurrentScore == pointsPerSet + 1 && !isTieBreaker) {
             player1WinsSet();
-        } else if (player2CurrentScore == pointsPerSet + 1 && isTieBreaker == false) {
+        } else if (player2CurrentScore == pointsPerSet + 1 && !isTieBreaker) {
             player2WinsSet();
         } else if (isTieBreaker && player1CurrentScore - player2CurrentScore == 2) {
             player1WinsSet();
@@ -261,13 +301,13 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
      * Then calls the alert dialog method.
      */
     private void player2WinsSet() {
+        isSetOver = true;
         player2SetsWon++;
 
         if (player2SetsWon == (totalSets / 2) + 1) {
             isGameOver = true;
             showAlertDialog(playerTwoName, "has won the match. Click on proceed to continue to see the match stats!");
         } else {
-            currentSet++;
             showAlertDialog(playerTwoName, "has won this set. Click on proceed to continue to the next set!");
         }
     }
@@ -278,13 +318,13 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
      * Then calls the alert dialog method.
      */
     private void player1WinsSet() {
+        isSetOver = true;
         player1SetsWon++;
 
         if (player1SetsWon == (totalSets / 2) + 1) {
             isGameOver = true;
             showAlertDialog(playerOneName, "has won the match. Click on proceed to continue to see the match stats!");
         } else {
-            currentSet++;
             showAlertDialog(playerOneName, "has won this set. Click on proceed to continue to the next set!");
         }
     }
@@ -313,6 +353,11 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                     finish();*/
                 }
             }
+        }).setNegativeButton("Undo", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                undo();
+            }
         }).setCancelable(false);
 
         AlertDialog alertDialog = alertDialogBuilder.create();
@@ -324,10 +369,15 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
      * text views, and switches the service for the new set.
      */
     private void newSet() {
-        isTieBreaker = false;
+        gameTrackerList.clear();
+
+        deleteAllGameDetailsFromDatabase();
+
+        isTieBreaker = isSetOver = false;
         player1CurrentScore = 0;
         player2CurrentScore = 0;
         totalScoreCount = 0;
+        currentSet++;
         textViewPlayer1Score.setText("" + player1CurrentScore);
         textViewPlayer2Score.setText("" + player2CurrentScore);
 
@@ -345,7 +395,16 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         switchService();
     }
 
+    private void deleteAllGameDetailsFromDatabase() {
+        myDatabase.database = myDatabase.openWritableDatabaseInstance();
+        myDatabase.deleteAllGameDetails();
+        myDatabase.closeDatabaseConnection();
+    }
+
     private void restartSet() {
+        gameTrackerList.clear();
+        deleteAllGameDetailsFromDatabase();
+
         isTieBreaker = false;
         player1CurrentScore = 0;
         player2CurrentScore = 0;
@@ -368,6 +427,10 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void restartMatch(){
+
+        gameTrackerList.clear();
+        deleteAllGameDetailsFromDatabase();
+
         isTieBreaker = false;
         player1CurrentScore = player2CurrentScore = player1SetsWon = player2SetsWon = totalScoreCount = 0;
         currentSet = 1;
