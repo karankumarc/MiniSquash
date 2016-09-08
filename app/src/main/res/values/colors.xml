@@ -8,4 +8,6 @@
     <color name="black">#000000</color>
     <color name="persianGreen">#18A999</color>
     <color name="electricBlue">#8AF3FF</color>
+    <color name="red">#FF0000</color>
+    <color name="green">#00ff00</color>
 </resources>

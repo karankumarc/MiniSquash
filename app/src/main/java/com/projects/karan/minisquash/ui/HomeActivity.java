@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.AppCompatSpinner;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,6 +17,7 @@ import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.projects.karan.minisquash.R;
+import com.projects.karan.minisquash.data.MyDatabase;
 import com.projects.karan.minisquash.utils.Constants;
 
 public class HomeActivity extends AppCompatActivity implements RadioGroup.OnCheckedChangeListener, View.OnClickListener{
@@ -28,14 +30,23 @@ public class HomeActivity extends AppCompatActivity implements RadioGroup.OnChec
     int pointsPerSet =0, serviceStarts = 0, totalSets = 1;
     private boolean hasPlayer1ServedFirstInMatch = false;
 
+    MyDatabase myDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
+        myDatabase =new MyDatabase(this);
+
+        setTitle("Home");
+
         if(checkIfGameScreenShouldBeOpened()){
             Intent intent = new Intent(HomeActivity.this, GameActivity.class);
+            startActivity(intent);
+            finish();
+        } else if(checkIfStatisticsShouldBeOpened()){
+            Intent intent = new Intent(HomeActivity.this, MatchStatisticsActivity.class);
             startActivity(intent);
             finish();
         }
@@ -77,6 +88,20 @@ public class HomeActivity extends AppCompatActivity implements RadioGroup.OnChec
 
         try {
             if(sharedPreferences.getString(Constants.KEY_SP_USER_SCREEN,null).equals(Constants.UserScreen.Game.toString())){
+                return true;
+            } else
+                return false;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    private boolean checkIfStatisticsShouldBeOpened() {
+        SharedPreferences sharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCE_FILE_NAME, MODE_PRIVATE);
+
+        try {
+            if(sharedPreferences.getString(Constants.KEY_SP_USER_SCREEN,null).equals(Constants.UserScreen.Statistics.toString())){
                 return true;
             } else
                 return false;
@@ -204,6 +229,14 @@ public class HomeActivity extends AppCompatActivity implements RadioGroup.OnChec
             case R.id.action_clear_data:
                 clearData();
                 break;
+            case R.id.action_history:
+                Intent intent = new Intent(HomeActivity.this, GameHistoryActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.action_player_history:
+                Intent intent1 = new Intent(HomeActivity.this, PlayerHistoryActivity.class);
+                startActivity(intent1);
+                break;
             case R.id.action_quit:
                 finish();
                 break;
@@ -225,6 +258,16 @@ public class HomeActivity extends AppCompatActivity implements RadioGroup.OnChec
         String player1Name = editTextPlayerOne.getText().toString().trim();
         String player2Name = editTextPlayerTwo.getText().toString().trim();
 
+        myDatabase.database = myDatabase.openWritableDatabaseInstance();
+        if(myDatabase.getIdIfPlayerExists(player1Name) == -1){
+            long l = myDatabase.createPlayerRow(player1Name);
+            Log.d("TAG", ""+l);
+        }
+
+        if(myDatabase.getIdIfPlayerExists(player2Name) == -1){
+            long l =myDatabase.createPlayerRow(player2Name);
+            Log.d("TAG", ""+l);
+        }
         if(!player1Name.isEmpty() && !player2Name.isEmpty() && serviceStarts != 0 && pointsPerSet != 0){
             Intent intent = new Intent(HomeActivity.this, GameActivity.class);
             intent.putExtra(Constants.KEY_PLAYER_ONE_NAME,player1Name);

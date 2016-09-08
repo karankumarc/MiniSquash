@@ -9,8 +9,20 @@
         app:showAsAction="ifRoom" />
 
     <item
+        android:id="@+id/action_history"
+        android:title="@string/action_history"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_player_history"
+        android:title="@string/action_player_history"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/action_quit"
         android:title="@string/action_quit"
         app:showAsAction="never" />
+
+
 
 </menu>

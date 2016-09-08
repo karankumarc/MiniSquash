@@ -34,18 +34,23 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     Button buttonPlayer1Point, buttonPlayer2Point;
 
     int pointsPerSet = 0, serviceStarts = 0, totalSets = 1, player1CurrentScore = 0, player2CurrentScore = 0,
-            totalScoreCount = 0, player1SetsWon = 0, player2SetsWon = 0, currentSet = 1;
+            player1TotalPointsWon = 0, player2TotalPointsWon = 0, totalScoreCount = 0,
+            player1SetsWon = 0, player2SetsWon = 0, currentSet = 1,
+            player1TotalServes = 0, player2TotalServes = 0, player1TotalPointsWonOnServes = 0, player2TotalPointsWonOnServes = 0;
     String playerOneName, playerTwoName;
     boolean isPlayer1Serving, hasPlayer1ServedFirstInSet, hasPlayer1ServedFirstInMatch;
     private boolean isTieBreaker = false, isGameOver = false, isSetOver = false;
     boolean isHomePressed = false;
 
     ArrayList<GameState> gameTrackerList = new ArrayList<>();
+    private boolean didPlayer1WinGame=false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
+
+        setTitle("Game");
 
         myDatabase = new MyDatabase(this);
 
@@ -72,7 +77,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
 
-        if(bundle != null){
+        if (bundle != null) {
             playerOneName = bundle.getString(Constants.KEY_PLAYER_ONE_NAME);
             playerTwoName = bundle.getString(Constants.KEY_PLAYER_TWO_NAME);
             pointsPerSet = bundle.getInt(Constants.KEY_POINTS_PER_SET);
@@ -90,7 +95,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             }
 
             setService();
-            
+
         } else {
             restoreMatchStateFromSharedPreferences();
         }
@@ -102,22 +107,28 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     private void restoreMatchStateFromSharedPreferences() {
         SharedPreferences sharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCE_FILE_NAME, MODE_PRIVATE);
 
-        playerOneName = sharedPreferences.getString(Constants.KEY_SP_PLAYER_1_NAME, null );
+        playerOneName = sharedPreferences.getString(Constants.KEY_SP_PLAYER_1_NAME, null);
         playerTwoName = sharedPreferences.getString(Constants.KEY_SP_PLAYER_2_NAME, null);
         pointsPerSet = sharedPreferences.getInt(Constants.KEY_SP_POINTS_PER_SET, 0);
-        totalSets= sharedPreferences.getInt(Constants.KEY_SP_TOTAL_SETS, 0);
+        totalSets = sharedPreferences.getInt(Constants.KEY_SP_TOTAL_SETS, 0);
         hasPlayer1ServedFirstInMatch = sharedPreferences.getBoolean(Constants.KEY_SP_HAS_PLAYER_1_SERVED_FIRST_IN_MATCH, false);
 
         isPlayer1Serving = sharedPreferences.getBoolean(Constants.KEY_SP_IS_PLAYER_1_SERVING, false);
         hasPlayer1ServedFirstInSet = sharedPreferences.getBoolean(Constants.KEY_SP_HAS_PLAYER_1_SERVED_FIRST_IN_SET, false);
         isTieBreaker = sharedPreferences.getBoolean(Constants.KEY_SP_IS_TIE_BREAKER, false);
         isGameOver = sharedPreferences.getBoolean(Constants.KEY_SP_IS_GAME_OVER, false);
-        player1CurrentScore = sharedPreferences.getInt(Constants.KEY_SP_PLAYER_ONE_CURRENT_SCORE, 0);
-        player2CurrentScore = sharedPreferences.getInt(Constants.KEY_SP_PLAYER_TWO_CURRENT_SCORE, 0);
+        player1CurrentScore = sharedPreferences.getInt(Constants.KEY_SP_PLAYER_1_CURRENT_SCORE, 0);
+        player2CurrentScore = sharedPreferences.getInt(Constants.KEY_SP_PLAYER_2_CURRENT_SCORE, 0);
         totalScoreCount = sharedPreferences.getInt(Constants.KEY_SP_TOTAL_SCORE_COUNT, 0);
         player1SetsWon = sharedPreferences.getInt(Constants.KEY_SP_PLAYER_1_SETS_WON, 0);
         player2SetsWon = sharedPreferences.getInt(Constants.KEY_SP_PLAYER_2_SETS_WON, 0);
         currentSet = sharedPreferences.getInt(Constants.KEY_SP_CURRENT_SET, 0);
+        player1TotalPointsWon = sharedPreferences.getInt(Constants.KEY_SP_PLAYER_1_TOTAL_POINTS_WON, 0);
+        player2TotalPointsWon = sharedPreferences.getInt(Constants.KEY_SP_PLAYER_2_TOTAL_POINTS_WON, 0);
+        player1TotalServes = sharedPreferences.getInt(Constants.KEY_SP_PLAYER_1_TOTAL_SERVES, 0);
+        player2TotalServes = sharedPreferences.getInt(Constants.KEY_SP_PLAYER_2_TOTAL_SERVES, 0);
+        player1TotalPointsWonOnServes = sharedPreferences.getInt(Constants.KEY_SP_PLAYER_1_TOTAL_POINTS_WON_ON_SERVES, 0);
+        player2TotalPointsWonOnServes = sharedPreferences.getInt(Constants.KEY_SP_PLAYER_2_TOTAL_POINTS_WON_ON_SERVES, 0);
 
         setService();
         textViewPlayer1Score.setText("" + player1CurrentScore);
@@ -128,12 +139,12 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
         myDatabase.database = myDatabase.openReadableDatabaseInstance();
         Cursor c = myDatabase.getAllGameDetails();
-        if(c.moveToFirst()){
-            do{
+        if (c.moveToFirst()) {
+            do {
                 int didPlayer1win = c.getInt(c.getColumnIndex(MiniSquashContract.GameStateDetailsEntry.COLUMN_DID_PLAYER_1_WIN));
                 GameState gameState = new GameState(didPlayer1win);
                 gameTrackerList.add(gameState);
-            }while (c.moveToNext());
+            } while (c.moveToNext());
         }
         myDatabase.closeDatabaseConnection();
     }
@@ -145,13 +156,23 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         hasPlayer1ServedFirstInSet = savedInstanceState.getBoolean(Constants.KEY_HAS_PLAYER_1_SERVED_FIRST_IN_SET);
         isTieBreaker = savedInstanceState.getBoolean(Constants.KEY_IS_TIE_BREAKER);
         isGameOver = savedInstanceState.getBoolean(Constants.KEY_IS_GAME_OVER);
-        player1CurrentScore = savedInstanceState.getInt(Constants.KEY_PLAYER_ONE_CURRENT_SCORE);
-        player2CurrentScore = savedInstanceState.getInt(Constants.KEY_PLAYER_TWO_CURRENT_SCORE);
+        player1CurrentScore = savedInstanceState.getInt(Constants.KEY_PLAYER_1_CURRENT_SCORE);
+        player2CurrentScore = savedInstanceState.getInt(Constants.KEY_PLAYER_2_CURRENT_SCORE);
         totalScoreCount = savedInstanceState.getInt(Constants.KEY_TOTAL_SCORE_COUNT);
         player1SetsWon = savedInstanceState.getInt(Constants.KEY_PLAYER_1_SETS_WON);
         player2SetsWon = savedInstanceState.getInt(Constants.KEY_PLAYER_2_SETS_WON);
         currentSet = savedInstanceState.getInt(Constants.KEY_CURRENT_SET);
-        gameTrackerList = (ArrayList<GameState>) savedInstanceState.getSerializable(Constants.KEY_GAME_TRACKER_LIST);
+        player2TotalPointsWon = savedInstanceState.getInt(Constants.KEY_PLAYER_2_TOTAL_POINTS_WON);
+        player1TotalServes = savedInstanceState.getInt(Constants.KEY_PLAYER_1_TOTAL_SERVES);
+        player2TotalServes = savedInstanceState.getInt(Constants.KEY_PLAYER_2_TOTAL_SERVES);
+        player1TotalPointsWonOnServes = savedInstanceState.getInt(Constants.KEY_PLAYER_1_TOTAL_POINTS_WON_ON_SERVES);
+        player2TotalPointsWonOnServes = savedInstanceState.getInt(Constants.KEY_PLAYER_2_TOTAL_POINTS_WON_ON_SERVES);
+
+        try {
+            gameTrackerList = (ArrayList<GameState>) savedInstanceState.getSerializable(Constants.KEY_GAME_TRACKER_LIST);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         setService();
         textViewPlayer1Score.setText("" + player1CurrentScore);
@@ -168,13 +189,19 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         outState.putBoolean(Constants.KEY_HAS_PLAYER_1_SERVED_FIRST_IN_SET, hasPlayer1ServedFirstInSet);
         outState.putBoolean(Constants.KEY_IS_TIE_BREAKER, isTieBreaker);
         outState.putBoolean(Constants.KEY_IS_GAME_OVER, isGameOver);
-        outState.putInt(Constants.KEY_PLAYER_ONE_CURRENT_SCORE, player1CurrentScore);
-        outState.putInt(Constants.KEY_PLAYER_TWO_CURRENT_SCORE, player2CurrentScore);
+        outState.putInt(Constants.KEY_PLAYER_1_CURRENT_SCORE, player1CurrentScore);
+        outState.putInt(Constants.KEY_PLAYER_2_CURRENT_SCORE, player2CurrentScore);
         outState.putInt(Constants.KEY_TOTAL_SCORE_COUNT, totalScoreCount);
         outState.putInt(Constants.KEY_PLAYER_1_SETS_WON, player1SetsWon);
         outState.putInt(Constants.KEY_PLAYER_2_SETS_WON, player2SetsWon);
         outState.putInt(Constants.KEY_CURRENT_SET, currentSet);
         outState.putSerializable(Constants.KEY_GAME_TRACKER_LIST, gameTrackerList);
+        outState.putInt(Constants.KEY_PLAYER_1_TOTAL_POINTS_WON, player1TotalPointsWon);
+        outState.putInt(Constants.KEY_PLAYER_2_TOTAL_POINTS_WON, player2TotalPointsWon);
+        outState.putInt(Constants.KEY_PLAYER_1_TOTAL_SERVES, player1TotalServes);
+        outState.putInt(Constants.KEY_PLAYER_2_TOTAL_SERVES, player2TotalServes);
+        outState.putInt(Constants.KEY_PLAYER_1_TOTAL_POINTS_WON_ON_SERVES, player1TotalPointsWonOnServes);
+        outState.putInt(Constants.KEY_PLAYER_2_TOTAL_POINTS_WON_ON_SERVES, player2TotalPointsWonOnServes);
     }
 
     private void saveMatchStateInSharedPreferences(Constants.UserScreen userScreen) {
@@ -188,17 +215,23 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         editor.putInt(Constants.KEY_SP_TOTAL_SETS, totalSets);
         editor.putBoolean(Constants.KEY_SP_HAS_PLAYER_1_SERVED_FIRST_IN_MATCH, hasPlayer1ServedFirstInMatch);
 
-        if(userScreen == Constants.UserScreen.Game){
+        if (userScreen == Constants.UserScreen.Game) {
             editor.putBoolean(Constants.KEY_SP_IS_PLAYER_1_SERVING, isPlayer1Serving);
             editor.putBoolean(Constants.KEY_SP_HAS_PLAYER_1_SERVED_FIRST_IN_SET, hasPlayer1ServedFirstInSet);
             editor.putBoolean(Constants.KEY_SP_IS_TIE_BREAKER, isTieBreaker);
             editor.putBoolean(Constants.KEY_SP_IS_GAME_OVER, isGameOver);
-            editor.putInt(Constants.KEY_SP_PLAYER_ONE_CURRENT_SCORE, player1CurrentScore);
-            editor.putInt(Constants.KEY_SP_PLAYER_TWO_CURRENT_SCORE, player2CurrentScore);
+            editor.putInt(Constants.KEY_SP_PLAYER_1_CURRENT_SCORE, player1CurrentScore);
+            editor.putInt(Constants.KEY_SP_PLAYER_2_CURRENT_SCORE, player2CurrentScore);
             editor.putInt(Constants.KEY_SP_TOTAL_SCORE_COUNT, totalScoreCount);
             editor.putInt(Constants.KEY_SP_PLAYER_1_SETS_WON, player1SetsWon);
             editor.putInt(Constants.KEY_SP_PLAYER_2_SETS_WON, player2SetsWon);
             editor.putInt(Constants.KEY_SP_CURRENT_SET, currentSet);
+            editor.putInt(Constants.KEY_SP_PLAYER_1_TOTAL_POINTS_WON, player1TotalPointsWon);
+            editor.putInt(Constants.KEY_SP_PLAYER_2_TOTAL_POINTS_WON, player2TotalPointsWon);
+            editor.putInt(Constants.KEY_SP_PLAYER_1_TOTAL_SERVES, player1TotalServes);
+            editor.putInt(Constants.KEY_SP_PLAYER_2_TOTAL_SERVES, player2TotalServes);
+            editor.putInt(Constants.KEY_SP_PLAYER_1_TOTAL_POINTS_WON_ON_SERVES, player1TotalPointsWonOnServes);
+            editor.putInt(Constants.KEY_SP_PLAYER_2_TOTAL_POINTS_WON_ON_SERVES, player2TotalPointsWonOnServes);
         }
 
         editor.putString(Constants.KEY_SP_USER_SCREEN, userScreen.toString());
@@ -215,6 +248,13 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.button_player_one_point) {
+            if (isPlayer1Serving) {
+                player1TotalServes++;
+                player1TotalPointsWonOnServes++;
+            } else {
+                player2TotalServes++;
+            }
+            player1TotalPointsWon++;
             player1CurrentScore++;
             totalScoreCount++;
             textViewPlayer1Score.setText("" + player1CurrentScore);
@@ -222,6 +262,13 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             GameState gameState = new GameState(true, isTieBreaker);
             gameTrackerList.add(gameState);
         } else if (v.getId() == R.id.button_player_two_point) {
+            if (isPlayer1Serving) {
+                player1TotalServes++;
+            } else {
+                player2TotalServes++;
+                player2TotalPointsWonOnServes++;
+            }
+            player2TotalPointsWon++;
             player2CurrentScore++;
             totalScoreCount++;
             textViewPlayer2Score.setText("" + player2CurrentScore);
@@ -231,42 +278,54 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private void undo(){
-        if( totalScoreCount == 0 || gameTrackerList.size() == 0 ){
+    private void undo() {
+        if (totalScoreCount == 0 || gameTrackerList.size() == 0) {
             Toast.makeText(GameActivity.this, "Game state info not available", Toast.LENGTH_SHORT).show();
-        } else if(totalScoreCount > 0 && gameTrackerList.size() != 0){
-            GameState previousGameState;
+        } else if (totalScoreCount > 0 && gameTrackerList.size() != 0) {
+            //GameState previousGameState;
             //previousGameState = gameTrackerList.get(gameTrackerList.size()-2);
-            GameState gameState = gameTrackerList.get(gameTrackerList.size()-1);
+            GameState gameState = gameTrackerList.get(gameTrackerList.size() - 1);
 
             /*if(gameState.didGameEnterInTieBreakerMode() && !previousGameState.didGameEnterInTieBreakerMode()){
                 isTieBreaker = false;
             }*/
-            if(totalScoreCount == pointsPerSet*2){
+            if (totalScoreCount == pointsPerSet * 2) {
                 isTieBreaker = false;
             }
 
-            if(gameState.didPlayer1WinThePoint()){
+            if (gameState.didPlayer1WinThePoint()) {
+                player1TotalPointsWon--;
                 player1CurrentScore--;
-                textViewPlayer1Score.setText(""+player1CurrentScore);
-                if(isGameOver || isSetOver){
+                textViewPlayer1Score.setText("" + player1CurrentScore);
+                if (isGameOver || isSetOver) {
                     isGameOver = isSetOver = false;
                     player1SetsWon--;
                 }
             } else {
+                player2TotalPointsWon--;
                 player2CurrentScore--;
-                textViewPlayer2Score.setText(""+player2CurrentScore);
-                if(isGameOver || isSetOver){
+                textViewPlayer2Score.setText("" + player2CurrentScore);
+                if (isGameOver || isSetOver) {
                     isGameOver = isSetOver = false;
                     player2SetsWon--;
                 }
             }
             totalScoreCount--;
-            gameTrackerList.remove(gameTrackerList.size()-1);
-
-
+            gameTrackerList.remove(gameTrackerList.size() - 1);
 
             checkServiceChangeOnUndo();
+
+            if (isPlayer1Serving) {
+                player1TotalServes--;
+                if(gameState.didPlayer1WinThePoint()){
+                    player1TotalPointsWonOnServes--;
+                }
+            } else {
+                player2TotalServes--;
+                if(!gameState.didPlayer1WinThePoint()){
+                    player2TotalPointsWonOnServes--;
+                }
+            }
         }
     }
 
@@ -306,6 +365,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
         if (player2SetsWon == (totalSets / 2) + 1) {
             isGameOver = true;
+            didPlayer1WinGame = false;
             showAlertDialog(playerTwoName, "has won the match. Click on proceed to continue to see the match stats!");
         } else {
             showAlertDialog(playerTwoName, "has won this set. Click on proceed to continue to the next set!");
@@ -323,16 +383,19 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
         if (player1SetsWon == (totalSets / 2) + 1) {
             isGameOver = true;
+            didPlayer1WinGame = true;
             showAlertDialog(playerOneName, "has won the match. Click on proceed to continue to see the match stats!");
         } else {
             showAlertDialog(playerOneName, "has won this set. Click on proceed to continue to the next set!");
         }
     }
 
-    /** Shows an alert dialog with the name and alert message and then
+    /**
+     * Shows an alert dialog with the name and alert message and then
      * calls the newSet() method if the game is not over. Else calls the
      * GameStats activity and finishes this method.
-     * @param name name of the player
+     *
+     * @param name    name of the player
      * @param message message to be displayed in dialog
      */
     private void showAlertDialog(String name, String message) {
@@ -347,7 +410,45 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 } else {
                     // New activity
                     // TASK FOR: FRIDAY
-
+                    Intent in = new Intent(GameActivity.this, MatchStatisticsActivity.class);
+                    in.putExtra(Constants.KEY_POINTS_PER_SET, pointsPerSet);
+                    in.putExtra(Constants.KEY_TOTAL_SETS, totalSets);
+                    if(didPlayer1WinGame){
+                        in.putExtra(Constants.KEY_WINNER_NAME, playerOneName);
+                        in.putExtra(Constants.KEY_WINNER_TOTAL_POINTS, player1TotalPointsWon);
+                        in.putExtra(Constants.KEY_WINNER_SETS_WON, player1SetsWon);
+                        in.putExtra(Constants.KEY_WINNER_TOTAL_SERVES, player1TotalServes);
+                        in.putExtra(Constants.KEY_WINNER_TOTAL_POINTS_WON_ON_SERVES, player1TotalPointsWonOnServes);
+                        in.putExtra(Constants.KEY_LOSER_NAME, playerTwoName);
+                        in.putExtra(Constants.KEY_LOSER_TOTAL_POINTS, player2TotalPointsWon);
+                        in.putExtra(Constants.KEY_LOSER_SETS_WON, player2SetsWon);
+                        in.putExtra(Constants.KEY_LOSER_TOTAL_SERVES, player2TotalServes);
+                        in.putExtra(Constants.KEY_LOSER_TOTAL_POINTS_WON_ON_SERVES, player2TotalPointsWonOnServes);
+                        if(serviceStarts == 1){
+                            in.putExtra(Constants.KEY_SERVICE_STARTED_BY_WINNER, 1);
+                        } else {
+                            in.putExtra(Constants.KEY_SERVICE_STARTED_BY_WINNER, 0);
+                        }
+                    } else {
+                        in.putExtra(Constants.KEY_WINNER_NAME, playerTwoName);
+                        in.putExtra(Constants.KEY_WINNER_TOTAL_POINTS, player2TotalPointsWon);
+                        in.putExtra(Constants.KEY_WINNER_SETS_WON, player2SetsWon);
+                        in.putExtra(Constants.KEY_WINNER_TOTAL_SERVES, player2TotalServes);
+                        in.putExtra(Constants.KEY_WINNER_TOTAL_POINTS_WON_ON_SERVES, player2TotalPointsWonOnServes);
+                        in.putExtra(Constants.KEY_LOSER_NAME, playerOneName);
+                        in.putExtra(Constants.KEY_LOSER_TOTAL_POINTS, player1TotalPointsWon);
+                        in.putExtra(Constants.KEY_LOSER_SETS_WON, player1SetsWon);
+                        in.putExtra(Constants.KEY_LOSER_TOTAL_SERVES, player1TotalServes);
+                        in.putExtra(Constants.KEY_LOSER_TOTAL_POINTS_WON_ON_SERVES, player1TotalPointsWonOnServes);
+                        if(serviceStarts == 2){
+                            in.putExtra(Constants.KEY_SERVICE_STARTED_BY_WINNER, 1);
+                        } else {
+                            in.putExtra(Constants.KEY_SERVICE_STARTED_BY_WINNER, 0);
+                        }
+                    }
+                    startActivity(in);
+                    saveMatchStateInSharedPreferences(Constants.UserScreen.Statistics);
+                    finish();
                     /*Intent in = new Intent(GameActivity.this, HomeActivity.class);
                     startActivity(in);
                     finish();*/
@@ -426,13 +527,14 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         switchService();
     }
 
-    private void restartMatch(){
+    private void restartMatch() {
 
         gameTrackerList.clear();
         deleteAllGameDetailsFromDatabase();
 
         isTieBreaker = false;
-        player1CurrentScore = player2CurrentScore = player1SetsWon = player2SetsWon = totalScoreCount = 0;
+        player1TotalPointsWon = player2TotalPointsWon = player1CurrentScore = player2CurrentScore =
+                player1SetsWon = player2SetsWon = totalScoreCount = 0;
         currentSet = 1;
 
         textViewPlayer1Score.setText("" + player1CurrentScore);
@@ -474,15 +576,15 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
     private void checkServiceChangeOnUndo() {
         if (pointsPerSet == 20) {
-            if (isTieBreaker)
+            if (isTieBreaker) {
                 switchService();
-            else if ((totalScoreCount+1) % ((pointsPerSet + 5) / 5) == 0) {
+            } else if ((totalScoreCount + 1) % ((pointsPerSet + 5) / 5) == 0) {
                 switchService();
             }
         } else {
-            if (isTieBreaker)
+            if (isTieBreaker) {
                 switchService();
-            else if ((totalScoreCount+1) % (pointsPerSet / 5) == 0) {
+            } else if ((totalScoreCount + 1) % (pointsPerSet / 5) == 0) {
                 switchService();
             }
         }
@@ -529,7 +631,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     public boolean onOptionsItemSelected(MenuItem item) {
         boolean handled = false;
 
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.action_undo:
                 handled = true;
                 undo();

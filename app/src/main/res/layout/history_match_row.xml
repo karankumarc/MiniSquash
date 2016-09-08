@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="@color/colorPrimary"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="?attr/actionBarSize">
+
+    <LinearLayout
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:orientation="horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/text_view_winner_name_row"
+            android:textSize="20sp"
+            android:layout_marginLeft="10dp"
+            android:textColor="@color/white"
+            android:text="Winner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:layout_gravity="center"
+            android:layout_marginLeft="10dp"
+            android:textColor="@color/white"
+            android:text="beat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/text_view_loser_name_row"
+            android:textSize="20sp"
+            android:layout_marginLeft="10dp"
+            android:textColor="@color/white"
+            android:text="Loser"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/text_view_timestamp_row"
+        android:layout_marginLeft="5dp"
+        android:textColor="@color/white"
+        android:layout_centerVertical="true"
+        android:text="2016-04-02"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/text_view_final_score_row"
+        android:layout_alignParentRight="true"
+        android:textSize="20sp"
+        android:layout_marginRight="15dp"
+        android:textColor="@color/white"
+        android:layout_centerVertical="true"
+        android:text="2-1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+
+
+</RelativeLayout>

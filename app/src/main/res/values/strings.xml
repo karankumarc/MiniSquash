@@ -5,4 +5,6 @@
     <string name="action_restart_set">Restart set</string>
     <string name="action_clear_data">Clear data</string>
     <string name="action_quit">Quit</string>
+    <string name="action_history">Game History</string>
+    <string name="action_player_history">Player Statistics</string>
 </resources>
