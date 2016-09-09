@@ -11,8 +11,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
@@ -22,7 +22,8 @@ import com.projects.karan.minisquash.utils.Constants;
 
 public class HomeActivity extends AppCompatActivity implements RadioGroup.OnCheckedChangeListener, View.OnClickListener{
 
-    EditText editTextPlayerOne, editTextPlayerTwo;
+
+    AutoCompleteTextView editTextPlayer1, editTextPlayer2;
     RadioGroup radioGroupPoints, radioGroupService;
     AppCompatSpinner spinnerSets;
     Button buttonStart;
@@ -51,8 +52,18 @@ public class HomeActivity extends AppCompatActivity implements RadioGroup.OnChec
             finish();
         }
 
-        editTextPlayerOne = (EditText) findViewById(R.id.edit_text_player_one);
-        editTextPlayerTwo = (EditText) findViewById(R.id.edit_text_player_two);
+        editTextPlayer1 = (AutoCompleteTextView) findViewById(R.id.edit_text_player_one);
+        editTextPlayer2 = (AutoCompleteTextView) findViewById(R.id.edit_text_player_two);
+
+        myDatabase.database = myDatabase.openReadableDatabaseInstance();
+
+        if(myDatabase.checkIfPlayerNamesExist()){
+            String[] playerNames = myDatabase.getPlayerNames();
+            myDatabase.closeDatabaseConnection();
+
+            editTextPlayer1.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, playerNames ));
+            editTextPlayer2.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, playerNames ));
+        }
 
         radioGroupPoints = (RadioGroup) findViewById(R.id.rg_points);
         radioGroupService = (RadioGroup) findViewById(R.id.rg_service);
@@ -116,8 +127,8 @@ public class HomeActivity extends AppCompatActivity implements RadioGroup.OnChec
         //SharedPreferences.Editor editor = sharedPreferences.edit();
         try {
             if(sharedPreferences.getString(Constants.KEY_SP_USER_SCREEN,null).equals(Constants.UserScreen.Home.toString())){
-                editTextPlayerOne.setText(sharedPreferences.getString(Constants.KEY_SP_PLAYER_1_NAME, null));
-                editTextPlayerTwo.setText(sharedPreferences.getString(Constants.KEY_SP_PLAYER_2_NAME, null));
+                editTextPlayer1.setText(sharedPreferences.getString(Constants.KEY_SP_PLAYER_1_NAME, null));
+                editTextPlayer2.setText(sharedPreferences.getString(Constants.KEY_SP_PLAYER_2_NAME, null));
                 int pointsPerSet = sharedPreferences.getInt(Constants.KEY_SP_POINTS_PER_SET, 0);
                 restorePointsPerSet(pointsPerSet);
                 int totalSets = sharedPreferences.getInt(Constants.KEY_SP_TOTAL_SETS, 0);
@@ -205,8 +216,8 @@ public class HomeActivity extends AppCompatActivity implements RadioGroup.OnChec
         SharedPreferences sharedPreferences = getSharedPreferences(Constants.SHARED_PREFERENCE_FILE_NAME, MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
-        editor.putString(Constants.KEY_SP_PLAYER_1_NAME, editTextPlayerOne.getText().toString());
-        editor.putString(Constants.KEY_SP_PLAYER_2_NAME, editTextPlayerTwo.getText().toString());
+        editor.putString(Constants.KEY_SP_PLAYER_1_NAME, editTextPlayer1.getText().toString());
+        editor.putString(Constants.KEY_SP_PLAYER_2_NAME, editTextPlayer2.getText().toString());
         editor.putInt(Constants.KEY_SP_POINTS_PER_SET, pointsPerSet);
         editor.putInt(Constants.KEY_SP_TOTAL_SETS, totalSets);
         editor.putBoolean(Constants.KEY_SP_HAS_PLAYER_1_SERVED_FIRST_IN_MATCH, hasPlayer1ServedFirstInMatch);
@@ -245,9 +256,9 @@ public class HomeActivity extends AppCompatActivity implements RadioGroup.OnChec
     }
 
     private void clearData() {
-        editTextPlayerOne.requestFocus();
-        editTextPlayerOne.setText("");
-        editTextPlayerTwo.setText("");
+        editTextPlayer1.requestFocus();
+        editTextPlayer1.setText("");
+        editTextPlayer2.setText("");
         radioGroupPoints.clearCheck();
         radioGroupService.clearCheck();
         spinnerSets.setSelection(0);
@@ -255,8 +266,8 @@ public class HomeActivity extends AppCompatActivity implements RadioGroup.OnChec
 
     @Override
     public void onClick(View v) {
-        String player1Name = editTextPlayerOne.getText().toString().trim();
-        String player2Name = editTextPlayerTwo.getText().toString().trim();
+        String player1Name = editTextPlayer1.getText().toString().trim();
+        String player2Name = editTextPlayer2.getText().toString().trim();
 
         myDatabase.database = myDatabase.openWritableDatabaseInstance();
         if(myDatabase.getIdIfPlayerExists(player1Name) == -1){

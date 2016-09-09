@@ -2,15 +2,13 @@ package com.projects.karan.minisquash.data;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.SearchRecentSuggestionsProvider;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.hardware.camera2.params.StreamConfigurationMap;
-
 import com.projects.karan.minisquash.data.MiniSquashContract.GameStateDetailsEntry;
 import com.projects.karan.minisquash.data.MiniSquashContract.MatchDetailsEntry;
 import com.projects.karan.minisquash.data.MiniSquashContract.PlayerDetailsEntry;
+import com.projects.karan.minisquash.model.Match;
 import com.projects.karan.minisquash.model.Player;
 
 import java.util.ArrayList;
@@ -40,15 +38,7 @@ public class MyDatabase {
         helper.close();
     }
 
-    public long insertGameDetails(boolean didPlayer1Win) {
-        ContentValues contentValues = new ContentValues();
-        if (didPlayer1Win)
-            contentValues.put(GameStateDetailsEntry.COLUMN_DID_PLAYER_1_WIN, 1);
-        else
-            contentValues.put(GameStateDetailsEntry.COLUMN_DID_PLAYER_1_WIN, 0);
-        return database.insert(GameStateDetailsEntry.TABLE_NAME, null, contentValues);
-    }
-
+    //region Methods for PlayerDetails table
     public long createPlayerRow(String playerName) {
         ContentValues contentValues = new ContentValues();
         contentValues.put(PlayerDetailsEntry.COLUMN_PLAYER_NAME, playerName);
@@ -72,7 +62,7 @@ public class MyDatabase {
         return matchesPlayedAndWon;
     }
 
-    public long setPlayerMatchesPlayedAndWon(long id, int matchesPlayed, int matchesWon){
+    public long updatePlayerMatchesPlayedAndWon(long id, int matchesPlayed, int matchesWon){
 
         ContentValues contentValues = new ContentValues();
         contentValues.put(PlayerDetailsEntry.COLUMN_MATCHES_PLAYED, matchesPlayed);
@@ -84,7 +74,6 @@ public class MyDatabase {
 
         return database.update(PlayerDetailsEntry.TABLE_NAME, contentValues, selection, selectionArgs);
     }
-
 
     public long getIdIfPlayerExists(String playerName){
 
@@ -99,11 +88,6 @@ public class MyDatabase {
         } else {
             return -1;
         }
-    }
-
-    public Cursor getAllGameDetails() {
-        String[] projection = {GameStateDetailsEntry.COLUMN_DID_PLAYER_1_WIN};
-        return database.query(GameStateDetailsEntry.TABLE_NAME, projection, null, null, null, null, null);
     }
 
     public ArrayList<Player> getAllPlayerDetails() {
@@ -125,19 +109,86 @@ public class MyDatabase {
 
     public Cursor getPlayerHistory() {
         String[] projection = {PlayerDetailsEntry._ID, PlayerDetailsEntry.COLUMN_PLAYER_NAME,
-            PlayerDetailsEntry.COLUMN_MATCHES_PLAYED, PlayerDetailsEntry.COLUMN_MATCHES_WON};
+                PlayerDetailsEntry.COLUMN_MATCHES_PLAYED, PlayerDetailsEntry.COLUMN_MATCHES_WON};
         return database.query(PlayerDetailsEntry.TABLE_NAME, projection, null, null, null, null, null);
     }
 
-    public Cursor getHistory() {
-        String[] projection = {MatchDetailsEntry._ID, MatchDetailsEntry.COLUMN_DATE, MatchDetailsEntry.COLUMN_WINNER_NAME,
-                MatchDetailsEntry.COLUMN_LOSER_NAME, MatchDetailsEntry.COLUMN_WINNER_SETS_WON, MatchDetailsEntry.COLUMN_LOSER_SETS_WON};
-        return database.query(MatchDetailsEntry.TABLE_NAME, projection, null, null, null, null, null);
+    public String[] getPlayerNames(){
+        String[] projection = {PlayerDetailsEntry.COLUMN_PLAYER_NAME};
+        Cursor cursor= database.query(PlayerDetailsEntry.TABLE_NAME, projection, null, null, null, null, null);
+        String[] playerNames = new String[cursor.getCount()];
+
+        if(cursor.moveToFirst()){
+            do{
+                playerNames[cursor.getPosition()] = cursor.getString(cursor.getColumnIndex(PlayerDetailsEntry.COLUMN_PLAYER_NAME));
+            }while (cursor.moveToNext());
+        }
+        return playerNames;
+    }
+
+    public boolean checkIfPlayerNamesExist(){
+        String[] projection = {PlayerDetailsEntry.COLUMN_PLAYER_NAME};
+        Cursor cursor= database.query(PlayerDetailsEntry.TABLE_NAME, projection, null, null, null, null, null);
+
+        if(cursor.moveToFirst()){
+            return true;
+        } else {
+            return false;
+        }
+    }
+    //endregion
+
+    //region Methods related to GameStateDetails table
+    public long insertGameDetails(boolean didPlayer1Win) {
+        ContentValues contentValues = new ContentValues();
+        if (didPlayer1Win)
+            contentValues.put(GameStateDetailsEntry.COLUMN_DID_PLAYER_1_WIN, 1);
+        else
+            contentValues.put(GameStateDetailsEntry.COLUMN_DID_PLAYER_1_WIN, 0);
+        return database.insert(GameStateDetailsEntry.TABLE_NAME, null, contentValues);
+    }
+
+    public Cursor getAllGameDetails() {
+        String[] projection = {GameStateDetailsEntry.COLUMN_DID_PLAYER_1_WIN};
+        return database.query(GameStateDetailsEntry.TABLE_NAME, projection, null, null, null, null, null);
     }
 
     public long deleteAllGameDetails() {
         return database.delete(GameStateDetailsEntry.TABLE_NAME, null, null);
     }
+    //endregion
+
+    //region Methods related to MatchDetails table
+    public Cursor getMatchHistory() {
+        String[] projection = {MatchDetailsEntry._ID, MatchDetailsEntry.COLUMN_DATE, MatchDetailsEntry.COLUMN_WINNER_NAME,
+                MatchDetailsEntry.COLUMN_LOSER_NAME, MatchDetailsEntry.COLUMN_WINNER_SETS_WON, MatchDetailsEntry.COLUMN_LOSER_SETS_WON};
+        return database.query(MatchDetailsEntry.TABLE_NAME, projection, null, null, null, null, null);
+    }
+
+    public ArrayList<Match> getMatchHistoryInArrayList() {
+        openReadableDatabaseInstance();
+        String[] projection = {MatchDetailsEntry._ID, MatchDetailsEntry.COLUMN_DATE, MatchDetailsEntry.COLUMN_WINNER_NAME,
+                MatchDetailsEntry.COLUMN_LOSER_NAME, MatchDetailsEntry.COLUMN_WINNER_SETS_WON, MatchDetailsEntry.COLUMN_LOSER_SETS_WON};
+        Cursor c =  database.query(MatchDetailsEntry.TABLE_NAME, projection, null, null, null, null, null);
+        ArrayList<Match> arrayListMatches = new ArrayList<>();
+
+        if(c.moveToFirst()){
+            do{
+                String date = c.getString(c.getColumnIndex(MatchDetailsEntry.COLUMN_DATE));
+                //String stringDate = Utils.SIMPLE_DATE_FORMAT.format(date.getTime());
+                Match match = new Match(c.getInt(c.getColumnIndex(MatchDetailsEntry._ID)),c.getInt(c.getColumnIndex(MatchDetailsEntry.COLUMN_WINNER_SETS_WON)),
+                        c.getInt(c.getColumnIndex(MatchDetailsEntry.COLUMN_LOSER_SETS_WON)), c.getString(c.getColumnIndex(MatchDetailsEntry.COLUMN_WINNER_NAME)),
+                        c.getString(c.getColumnIndex(MatchDetailsEntry.COLUMN_LOSER_NAME)),
+                        date);
+                arrayListMatches.add(match);
+            }while (c.moveToNext());
+        }
+        closeDatabaseConnection();
+
+        return arrayListMatches;
+    }
+
+
 
     public long insertMatchDetails(String date, String time, int pointsPerSet, int serviceStartedByWinner, int totalSets,
                                    String winnerName, int winnerTotalPointsWon, int winnerSetsWon, int winnerTotalServes, int winnerPointsWonInService,
@@ -166,6 +217,7 @@ public class MyDatabase {
 
         return database.insert(MatchDetailsEntry.TABLE_NAME, null, contentValues);
     }
+    //endregion
 
     private class MiniSquashDbHelper extends SQLiteOpenHelper {
 
@@ -210,7 +262,6 @@ public class MyDatabase {
         //endregion
 
         private static final String DATABASE_NAME = "MiniSquash.db";
-
         private static final int DATABASE_VERSION = 4;
 
         public MiniSquashDbHelper(Context context) {

@@ -11,7 +11,6 @@ import android.widget.Toast;
 
 import com.projects.karan.minisquash.R;
 import com.projects.karan.minisquash.data.MyDatabase;
-import com.projects.karan.minisquash.model.GameState;
 import com.projects.karan.minisquash.utils.Constants;
 import com.projects.karan.minisquash.utils.Utils;
 
@@ -100,9 +99,9 @@ public class MatchStatisticsActivity extends AppCompatActivity {
         long loserId = myDatabase.getIdIfPlayerExists(loserName);
 
         int[] winnerDetails = myDatabase.getPlayerMatchesPlayedAndWon(winnerId);
-        myDatabase.setPlayerMatchesPlayedAndWon(winnerId, ++winnerDetails[0], ++winnerDetails[1]);
+        myDatabase.updatePlayerMatchesPlayedAndWon(winnerId, ++winnerDetails[0], ++winnerDetails[1]);
         int[] loserDetails = myDatabase.getPlayerMatchesPlayedAndWon(loserId);
-        myDatabase.setPlayerMatchesPlayedAndWon(loserId, ++loserDetails[0], loserDetails[1]);
+        myDatabase.updatePlayerMatchesPlayedAndWon(loserId, ++loserDetails[0], loserDetails[1]);
 
         if(winnerId != -1 || loserId != -1){
             myDatabase.insertMatchDetails(Utils.SIMPLE_DATE_FORMAT.format(d),Utils.SIMPLE_HOUR_FORMAT.format(d) ,pointsPerSet, serviceStartedByWinner, totalSets,

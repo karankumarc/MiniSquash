@@ -37,7 +37,7 @@ public class GameHistoryActivity extends AppCompatActivity {
 
         myDatabase.database = myDatabase.openReadableDatabaseInstance();
         try {
-            Cursor c = myDatabase.getHistory();
+            Cursor c = myDatabase.getMatchHistory();
             if(c.moveToFirst()){
                 do{
                     String date = c.getString(c.getColumnIndex(MatchDetailsEntry.COLUMN_DATE));

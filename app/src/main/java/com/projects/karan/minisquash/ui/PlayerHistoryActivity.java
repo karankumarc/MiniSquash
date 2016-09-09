@@ -16,6 +16,7 @@ import com.projects.karan.minisquash.data.MiniSquashContract;
 import com.projects.karan.minisquash.data.MyDatabase;
 import com.projects.karan.minisquash.model.Match;
 import com.projects.karan.minisquash.model.Player;
+import com.projects.karan.minisquash.utils.Utils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -99,15 +100,9 @@ public class PlayerHistoryActivity extends AppCompatActivity {
             textViewId.setText(""+player.getId());
             textViewName.setText(player.getName());
             textViewMatchesPlayed.setText(""+player.getMatchesPlayed());
-            textViewWinPercent.setText(""+round(((double)player.getMatchesPlayed()/(double)player.getMatchesWon())*100,2));
+            textViewWinPercent.setText(""+ Utils.round(((double)player.getMatchesWon()/(double)player.getMatchesPlayed())*100,2));
 
             return v;
-        }
-        public double round(double value, int places) {
-            if (places < 0) throw new IllegalArgumentException();
-            BigDecimal bd = new BigDecimal(value);
-            bd = bd.setScale(places, RoundingMode.HALF_UP);
-            return bd.doubleValue();
         }
     }
 
