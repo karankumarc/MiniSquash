@@ -125,12 +125,34 @@
             android:textSize="24sp"
             android:textStyle="bold" />
 
-        <android.support.v7.widget.AppCompatSpinner
-            android:id="@+id/spinnerSets"
+        <RelativeLayout
+            android:layout_gravity="center|top"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:gravity="center" />
+            android:layout_height="30dp">
+
+            <Spinner
+                android:id="@+id/spinnerSets"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_gravity="center"
+                android:background="@android:color/transparent"
+                android:gravity="center"
+                android:layout_marginLeft="10dp"
+                android:spinnerMode="dropdown" />
+
+            <ImageView
+                android:layout_marginRight="-25dp"
+                android:tint="@color/colorAccent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_gravity="center"
+                android:src="@mipmap/drop" />
+
+        </RelativeLayout>
 
     </LinearLayout>
 

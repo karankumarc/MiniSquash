@@ -14,6 +14,7 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.RadioGroup;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.projects.karan.minisquash.R;
@@ -25,7 +26,7 @@ public class HomeActivity extends AppCompatActivity implements RadioGroup.OnChec
 
     AutoCompleteTextView editTextPlayer1, editTextPlayer2;
     RadioGroup radioGroupPoints, radioGroupService;
-    AppCompatSpinner spinnerSets;
+    Spinner spinnerSets;
     Button buttonStart;
     String[] setsArray = {"1","3", "5","7"};
     int pointsPerSet =0, serviceStarts = 0, totalSets = 1;
@@ -71,7 +72,7 @@ public class HomeActivity extends AppCompatActivity implements RadioGroup.OnChec
         radioGroupService.setOnCheckedChangeListener(this);
         radioGroupPoints.setOnCheckedChangeListener(this);
 
-        spinnerSets = (AppCompatSpinner) findViewById(R.id.spinnerSets);
+        spinnerSets = (Spinner) findViewById(R.id.spinnerSets);
 
         buttonStart = (Button) findViewById(R.id.button_start_game);
 

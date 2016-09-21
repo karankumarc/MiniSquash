@@ -600,7 +600,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
     /**
      * Switches the service from who ever is currently serving
-     * and sets the background.
+     * and sets the spinner_background.
      */
     private void switchService() {
         if (isPlayer1Serving) {
@@ -615,7 +615,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     /**
-     * Sets the background of the current service holder.
+     * Sets the spinner_background of the current service holder.
      * Called for the first time in onCreate() and also in onRestoreInstanceState().
      */
     private void setService() {
