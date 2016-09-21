@@ -26,23 +26,23 @@ import java.util.ArrayList;
 
 public class GameActivity extends AppCompatActivity implements View.OnClickListener {
 
-    MyDatabase myDatabase;
+    private MyDatabase myDatabase;
 
-    LinearLayout linearLayoutPlayer1, linearLayoutPlayer2;
-    TextView textViewPlayer1Name, textViewPlayer2Name, textViewPlayer1Score, textViewPlayer2Score, textViewCurrentSet,
+    private LinearLayout linearLayoutPlayer1, linearLayoutPlayer2;
+    private TextView textViewPlayer1Name, textViewPlayer2Name, textViewPlayer1Score, textViewPlayer2Score, textViewCurrentSet,
             textViewPlayer1SetsWon, textViewPlayer2SetsWon;
-    Button buttonPlayer1Point, buttonPlayer2Point;
+    private Button buttonPlayer1Point, buttonPlayer2Point;
 
-    int pointsPerSet = 0, serviceStarts = 0, totalSets = 1, player1CurrentScore = 0, player2CurrentScore = 0,
+    private int pointsPerSet = 0, serviceStarts = 0, totalSets = 1, player1CurrentScore = 0, player2CurrentScore = 0,
             player1TotalPointsWon = 0, player2TotalPointsWon = 0, totalScoreCount = 0,
             player1SetsWon = 0, player2SetsWon = 0, currentSet = 1,
             player1TotalServes = 0, player2TotalServes = 0, player1TotalPointsWonOnServes = 0, player2TotalPointsWonOnServes = 0;
-    String playerOneName, playerTwoName;
-    boolean isPlayer1Serving, hasPlayer1ServedFirstInSet, hasPlayer1ServedFirstInMatch;
+    private String playerOneName, playerTwoName;
+    private boolean isPlayer1Serving, hasPlayer1ServedFirstInSet, hasPlayer1ServedFirstInMatch;
     private boolean isTieBreaker = false, isGameOver = false, isSetOver = false;
-    boolean isHomePressed = false;
+    private boolean isHomePressed = false;
 
-    ArrayList<GameState> gameTrackerList = new ArrayList<>();
+    private ArrayList<GameState> gameTrackerList = new ArrayList<>();
     private boolean didPlayer1WinGame=false;
 
     @Override
@@ -348,6 +348,14 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         } else if (isTieBreaker && player1CurrentScore - player2CurrentScore == 2) {
             player1WinsSet();
         } else if (isTieBreaker && player2CurrentScore - player1CurrentScore == 2) {
+            player2WinsSet();
+        } else if(pointsPerSet == 10 && player1CurrentScore == 5 && player2CurrentScore == 0){
+            player1WinsSet();
+        } else if(pointsPerSet == 10 && player2CurrentScore == 5 && player1CurrentScore == 0){
+            player2WinsSet();
+        }else if(pointsPerSet == 20 && player1CurrentScore == 7 && player2CurrentScore == 0){
+            player1WinsSet();
+        } else if(pointsPerSet == 20 && player2CurrentScore == 7 && player1CurrentScore == 0){
             player2WinsSet();
         }
 
