@@ -92,15 +92,17 @@ public class PlayerHistoryActivity extends AppCompatActivity {
 
             View v = getLayoutInflater().inflate(R.layout.history_player_row, parent, false);
 
-            TextView textViewId = (TextView) v.findViewById(R.id.text_view_id);
             TextView textViewName = (TextView) v.findViewById(R.id.text_view_player_name);
             TextView textViewMatchesPlayed = (TextView) v.findViewById(R.id.text_view_player_matches_played);
             TextView textViewWinPercent = (TextView) v.findViewById(R.id.text_view_player_matches_won);
 
-            textViewId.setText(""+player.getId());
             textViewName.setText(player.getName());
             textViewMatchesPlayed.setText(""+player.getMatchesPlayed());
-            textViewWinPercent.setText(""+ Utils.round(((double)player.getMatchesWon()/(double)player.getMatchesPlayed())*100,2));
+            if((double)player.getMatchesPlayed()==0){
+                textViewWinPercent.setText(""+0);
+            } else {
+                textViewWinPercent.setText(""+ Utils.round(((double)player.getMatchesWon()/(double)player.getMatchesPlayed())*100,2));
+            }
 
             return v;
         }

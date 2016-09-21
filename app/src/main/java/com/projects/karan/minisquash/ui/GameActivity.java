@@ -280,7 +280,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
     private void undo() {
         if (totalScoreCount == 0 || gameTrackerList.size() == 0) {
-            Toast.makeText(GameActivity.this, "Game state info not available", Toast.LENGTH_SHORT).show();
+            Toast.makeText(GameActivity.this, R.string.game_info_not_available, Toast.LENGTH_SHORT).show();
         } else if (totalScoreCount > 0 && gameTrackerList.size() != 0) {
             //GameState previousGameState;
             //previousGameState = gameTrackerList.get(gameTrackerList.size()-2);
@@ -649,6 +649,13 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 onHomePressed();
         }
         return handled;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Bundle outState = new Bundle();
+        onSaveInstanceState(outState);
     }
 
     private void onHomePressed() {

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MiniSquash</string>
+    <string name="app_name">Mini Squash</string>
     <string name="action_undo">Undo</string>
     <string name="action_restart_match">Restart match</string>
     <string name="action_restart_set">Restart set</string>
@@ -7,4 +7,5 @@
     <string name="action_quit">Quit</string>
     <string name="action_history">Game History</string>
     <string name="action_player_history">Player Statistics</string>
+    <string name="game_info_not_available">Game state information is not available</string>
 </resources>

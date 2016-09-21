@@ -3,7 +3,7 @@ package com.projects.karan.minisquash.model;
 /**
  * Created by ADMIN on 9/5/2016.
  */
-public class GameState {
+public class GameState implements java.io.Serializable{
 
     private boolean didPlayer1WinThePoint;
     private boolean didGameEnterInTieBreakerMode;

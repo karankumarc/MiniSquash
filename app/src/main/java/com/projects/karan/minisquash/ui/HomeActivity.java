@@ -75,7 +75,8 @@ public class HomeActivity extends AppCompatActivity implements RadioGroup.OnChec
 
         buttonStart = (Button) findViewById(R.id.button_start_game);
 
-        spinnerSets.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, setsArray));
+        spinnerSets.setAdapter(new ArrayAdapter<String>(this, R.layout.spinner_row, setsArray));
+        spinnerSets.setBackgroundResource(R.drawable.rectangle);
 
         spinnerSets.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override

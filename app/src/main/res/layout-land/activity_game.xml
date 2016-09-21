@@ -22,17 +22,17 @@
             android:layout_height="match_parent">
 
             <TextView
+                android:textColor="@color/colorAccent"
                 android:textStyle="bold"
                 android:textSize="24sp"
                 android:layout_gravity="center"
-                android:textColor="@color/white"
                 android:text="Current Set"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
             <TextView
                 android:id="@+id/text_view_current_set"
-                android:textColor="@color/electricBlue"
+                android:textColor="@color/white"
                 android:textStyle="bold"
                 android:layout_gravity="center"
                 android:textSize="64sp"
@@ -51,6 +51,7 @@
             android:layout_height="match_parent">
 
             <TextView
+                android:textColor="@color/secondaryAccentColor"
                 android:layout_marginTop="20dp"
                 android:textStyle="bold"
                 android:textSize="24sp"
@@ -61,7 +62,7 @@
                 android:layout_height="0dp"
                 android:layout_weight="1"/>
             <TextView
-                android:textColor="@android:color/black"
+                android:textColor="@color/white"
                 android:textSize="100sp"
                 android:gravity="center"
                 android:text="0"
@@ -87,6 +88,7 @@
             android:layout_height="match_parent">
 
             <TextView
+                android:textColor="@color/secondaryAccentColor"
                 android:layout_marginTop="20dp"
                 android:textStyle="bold"
                 android:textSize="24sp"
@@ -97,7 +99,7 @@
                 android:layout_height="0dp"
                 android:layout_weight="1"/>
             <TextView
-                android:textColor="@android:color/black"
+                android:textColor="@color/white"
                 android:textSize="100sp"
                 android:gravity="center"
                 android:text="0"

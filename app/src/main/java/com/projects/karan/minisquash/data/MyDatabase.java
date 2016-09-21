@@ -175,7 +175,6 @@ public class MyDatabase {
         if(c.moveToFirst()){
             do{
                 String date = c.getString(c.getColumnIndex(MatchDetailsEntry.COLUMN_DATE));
-                //String stringDate = Utils.SIMPLE_DATE_FORMAT.format(date.getTime());
                 Match match = new Match(c.getInt(c.getColumnIndex(MatchDetailsEntry._ID)),c.getInt(c.getColumnIndex(MatchDetailsEntry.COLUMN_WINNER_SETS_WON)),
                         c.getInt(c.getColumnIndex(MatchDetailsEntry.COLUMN_LOSER_SETS_WON)), c.getString(c.getColumnIndex(MatchDetailsEntry.COLUMN_WINNER_NAME)),
                         c.getString(c.getColumnIndex(MatchDetailsEntry.COLUMN_LOSER_NAME)),
@@ -262,7 +261,7 @@ public class MyDatabase {
         //endregion
 
         private static final String DATABASE_NAME = "MiniSquash.db";
-        private static final int DATABASE_VERSION = 4;
+        private static final int DATABASE_VERSION = 5;
 
         public MiniSquashDbHelper(Context context) {
             super(context, DATABASE_NAME, null, DATABASE_VERSION);

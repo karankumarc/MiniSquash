@@ -1,75 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:background="@color/colorPrimary"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_width="match_parent"
     android:layout_height="?attr/actionBarSize">
 
     <TextView
-        android:id="@+id/text_view_id"
-        android:layout_marginLeft="15dp"
-        android:textSize="16sp"
-        android:textColor="@color/white"
-        android:layout_centerVertical="true"
-        android:text="1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-
-    <TextView
-        android:id="@+id/text_view_player_name"
-        android:layout_marginLeft="15dp"
-        android:textSize="16sp"
-        android:layout_toRightOf="@id/text_view_id"
-        android:textColor="@color/white"
-        android:layout_centerVertical="true"
+        android:layout_gravity="center"
         android:text="Player Name"
+        android:gravity="center"
+        android:id="@+id/text_view_player_name"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="@color/colorAccent"
         android:layout_width="wrap_content"
+        android:layout_weight="1"
         android:layout_height="wrap_content" />
 
     <TextView
+        android:layout_gravity="center"
         android:id="@+id/matches_played"
-        android:layout_marginLeft="15dp"
         android:textSize="16sp"
-        android:layout_toRightOf="@id/text_view_player_name"
-        android:textColor="@color/white"
-        android:layout_centerVertical="true"
-        android:text="Matches Played"
-        android:layout_width="wrap_content"
+        android:textColor="@color/secondaryAccentColor"
+        android:text="Played"
+        android:layout_width="0dp"
+        android:layout_weight="1"
         android:layout_height="wrap_content" />
 
     <TextView
         android:id="@+id/text_view_player_matches_played"
-        android:layout_marginLeft="15dp"
-        android:textSize="16sp"
-        android:layout_toRightOf="@id/matches_played"
-        android:textColor="@color/white"
-        android:layout_centerVertical="true"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="@color/colorAccent"
+        android:layout_gravity="center"
+        android:gravity="center"
         android:text="23"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
     <TextView
         android:id="@+id/win_percent"
-        android:layout_marginLeft="15dp"
+        android:layout_gravity="center"
+        android:gravity="center"
         android:textSize="16sp"
         android:layout_toRightOf="@id/text_view_player_matches_played"
-        android:textColor="@color/white"
+        android:textColor="@color/secondaryAccentColor"
         android:layout_centerVertical="true"
         android:text="Win%"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="1"
         android:layout_height="wrap_content" />
 
     <TextView
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:textStyle="bold"
         android:id="@+id/text_view_player_matches_won"
-        android:layout_marginLeft="15dp"
-        android:textSize="16sp"
+        android:textSize="20sp"
         android:layout_toRightOf="@id/win_percent"
-        android:textColor="@color/white"
+        android:textColor="@color/colorAccent"
         android:layout_centerVertical="true"
         android:text="23"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="1"
         android:layout_height="wrap_content" />
 
 
 
 
-</RelativeLayout>
+</LinearLayout>

@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="@color/colorPrimary"
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
@@ -73,50 +74,63 @@
             android:layout_height="wrap_content">
 
             <TextView
-                android:textStyle="bold"
-                android:gravity="center"
-                android:textSize="24sp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="left"
                 android:text="Points: "
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:textColor="@color/colorAccent"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
             <RadioButton
                 android:id="@+id/rb_points_five"
-                android:text="5"
                 android:layout_width="0dp"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:layout_height="wrap_content" />
+                android:text="5"
+                android:textColor="@color/colorAccent"
+                android:textSize="20sp"
+                android:textStyle="bold" />
 
             <RadioButton
                 android:id="@+id/rb_points_ten"
-                android:text="10"
                 android:layout_width="0dp"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:layout_height="wrap_content" />
+                android:text="10"
+                android:textColor="@color/colorAccent"
+                android:textSize="20sp"
+                android:textStyle="bold" />
 
             <RadioButton
                 android:id="@+id/rb_points_twenty"
-                android:text="20"
-                android:layout_weight="1"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="20"
+                android:textColor="@color/colorAccent"
+                android:textSize="20sp"
+                android:textStyle="bold" />
 
         </RadioGroup>
 
         <TextView
-            android:textStyle="bold"
-            android:gravity="center"
-            android:textSize="24sp"
-            android:text="Sets:"
             android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_height="wrap_content" />
+            android:gravity="center"
+            android:text="Sets:"
+            android:textColor="@color/colorAccent"
+            android:textSize="24sp"
+            android:textStyle="bold" />
 
         <android.support.v7.widget.AppCompatSpinner
-            android:gravity="center"
             android:id="@+id/spinnerSets"
-            android:layout_weight="1"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center" />
 
     </LinearLayout>
 
@@ -130,26 +144,34 @@
         android:layout_weight="1">
 
         <TextView
-            android:textStyle="bold"
-            android:gravity="left"
-            android:textSize="24sp"
-            android:text="Service: "
             android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_height="wrap_content" />
+            android:gravity="left"
+            android:text="Service: "
+            android:textColor="@color/colorAccent"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
         <RadioButton
             android:id="@+id/rb_service_one"
-            android:text="Player 1"
             android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_height="wrap_content" />
+            android:text="Player 1"
+            android:textColor="@color/colorAccent"
+            android:textSize="20sp"
+            android:textStyle="bold" />
 
         <RadioButton
             android:id="@+id/rb_service_two"
-            android:text="Player 2"
-            android:layout_weight="1"
             android:layout_width="0dp"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Player 2"
+            android:textColor="@color/colorAccent"
+            android:textSize="20sp"
+            android:textStyle="bold" />
     </RadioGroup>
 
 
@@ -157,7 +179,7 @@
     <Button
         android:id="@+id/button_start_game"
         android:layout_marginTop="15dp"
-        android:textColor="@color/white"
+        android:textColor="@color/colorPrimaryDark"
         android:text="Start Game"
         android:background="@color/colorAccent"
         android:layout_width="match_parent"

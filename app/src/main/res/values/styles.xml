@@ -11,14 +11,13 @@
     <style name="TextViewNormal">
         <item name="android:gravity">center</item>
         <item name="android:textSize">30sp</item>
-        <item name="android:textColor">@color/white</item>
+        <item name="android:textColor">@color/colorAccent</item>
     </style>
 
     <style name="ButtonNormal">
-        <item name="android:background">@color/persianGreen</item>
+        <item name="android:background">@color/secondaryAccentColor</item>
         <item name="android:layout_margin">10dp</item>
         <item name="android:textColor">@color/white</item>
         <item name="android:layout_gravity">center</item>
     </style>
-
 </resources>

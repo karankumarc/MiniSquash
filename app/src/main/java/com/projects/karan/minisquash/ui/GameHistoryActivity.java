@@ -16,6 +16,8 @@ import com.projects.karan.minisquash.data.MyDatabase;
 import com.projects.karan.minisquash.model.Match;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 public class GameHistoryActivity extends AppCompatActivity {
 
@@ -29,6 +31,8 @@ public class GameHistoryActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game_history);
+
+        setTitle("Game History");
 
         myDatabase = new MyDatabase(this);
 
@@ -49,11 +53,24 @@ public class GameHistoryActivity extends AppCompatActivity {
                     matchArrayList.add(match);
                 }while (c.moveToNext());
             }
-            myDatabase.closeDatabaseConnection();
+            sortMatchesFromRecentToLast();
         } catch (Exception e) {
             e.printStackTrace();
+        }finally {
+            myDatabase.closeDatabaseConnection();
         }
+
         listView.setAdapter(myAdapter);
+    }
+
+    private void sortMatchesFromRecentToLast() {
+        Collections.sort(matchArrayList, new Comparator<Match>(){
+            public int compare(Match m1, Match m2){
+                if(m1.getId() == m2.getId())
+                    return 0;
+                return m1.getId() > m2.getId() ? -1 : 1;
+            }
+        });
     }
 
     @Override
